@@ -1,5 +1,6 @@
 package com.example.database.entity
 
+import com.example.database.input.web.dto.StudentResponseDto
 import jakarta.persistence.*
 
 @Entity
@@ -11,4 +12,12 @@ data class Student(
     var firstName: String?,
     var lastName: String?,
     var email: String?,
-)
+) {
+    fun toStudentResponseDto(): StudentResponseDto =
+        StudentResponseDto(
+            id = id,
+            firstName = firstName,
+            lastName = lastName,
+            email = email
+        )
+}

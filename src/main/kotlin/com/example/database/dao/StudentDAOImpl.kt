@@ -18,4 +18,8 @@ class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
         )
         entityManager.persist(record)
     }
+
+    override fun getById(id: Int): Student? {
+        return entityManager.find(Student::class.java, id)
+    }
 }
