@@ -16,6 +16,12 @@ class StudentController(
     private val studentRepository: StudentDAO
 ) {
 
+    @GetMapping
+    fun findAll(): List<StudentResponseDto> {
+        val students = studentRepository.findAll()
+        return students.map { it.toStudentResponseDto() }
+    }
+
     @GetMapping("/{id}")
     fun findById(@PathVariable("id") id: Int): StudentResponseDto? {
         val student = studentRepository.getById(id)

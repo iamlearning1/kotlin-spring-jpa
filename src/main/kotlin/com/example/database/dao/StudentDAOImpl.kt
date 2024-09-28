@@ -22,4 +22,9 @@ class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
     override fun getById(id: Int): Student? {
         return entityManager.find(Student::class.java, id)
     }
+
+    override fun findAll(): List<Student> {
+        val query = entityManager.createQuery("from Student", Student::class.java)
+        return query.resultList
+    }
 }

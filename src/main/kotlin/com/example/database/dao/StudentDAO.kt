@@ -8,4 +8,6 @@ interface StudentDAO {
     fun save(student: StudentRequestDto)
 
     fun getById(id: Int): Student?
+
+    fun findAll(): List<Student>
 }
