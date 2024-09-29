@@ -14,5 +14,7 @@ interface StudentDAO {
 
     fun findByLastName(lastName: String): List<Student>
 
-    fun update(student: StudentUpdateRequestDto)
+    fun update(student: StudentUpdateRequestDto): Student
+
+    fun delete(id: Int)
 }

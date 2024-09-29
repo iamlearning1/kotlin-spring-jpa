@@ -4,6 +4,7 @@ import com.example.database.dao.StudentDAO
 import com.example.database.input.web.dto.StudentRequestDto
 import com.example.database.input.web.dto.StudentResponseDto
 import com.example.database.input.web.dto.StudentUpdateRequestDto
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -41,7 +42,12 @@ class StudentController(
     }
 
     @PatchMapping
-    fun updateStudent(@RequestBody student: StudentUpdateRequestDto) {
-        studentRepository.update(student)
+    fun updateStudent(@RequestBody student: StudentUpdateRequestDto): StudentResponseDto {
+        return studentRepository.update(student).toStudentResponseDto()
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteStudent(@PathVariable id: Int) {
+        return studentRepository.delete(id)
     }
 }

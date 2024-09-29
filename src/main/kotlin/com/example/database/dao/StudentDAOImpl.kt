@@ -6,18 +6,20 @@ import com.example.database.input.web.dto.StudentUpdateRequestDto
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Repository
 class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
 
     @Transactional
     override fun save(student: StudentRequestDto) {
-        val record = Student(
-            firstName = student.firstName,
-            lastName = student.lastName,
-            email = student.email
+        entityManager.createQuery(
+            "insert into Student (firstName, lastName, email) values (:firstName, :lastName, :email)"
         )
-        entityManager.persist(record)
+            .setParameter("firstName", student.firstName)
+            .setParameter("lastName", student.lastName)
+            .setParameter("email", student.email)
+            .executeUpdate()
     }
 
     override fun getById(id: Int): Student? {
@@ -39,7 +41,7 @@ class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
     }
 
     @Transactional
-    override fun update(student: StudentUpdateRequestDto) {
+    override fun update(student: StudentUpdateRequestDto): Student {
         val newStudent = entityManager.find(Student::class.java, student.id)
 
         val updatedStudent = newStudent.copy(
@@ -49,5 +51,13 @@ class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
         )
 
         entityManager.merge(updatedStudent)
+
+        return updatedStudent
+    }
+
+    @Transactional
+    override fun delete(id: Int) {
+        val student = entityManager.find(Student::class.java, id)
+        entityManager.remove(student)
     }
 }
