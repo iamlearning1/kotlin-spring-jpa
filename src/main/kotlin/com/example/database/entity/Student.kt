@@ -9,7 +9,7 @@ import java.util.UUID
 data class Student(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     var firstName: String?,
     var lastName: String?,
     var email: String?,

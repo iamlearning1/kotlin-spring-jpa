@@ -39,11 +39,11 @@ class StudentController(
         ResponseEntity.status(HttpStatus.CREATED)
     }
 
-    @PatchMapping
-    fun updateStudent(@RequestBody student: StudentUpdateRequestDto): ResponseEntity<StudentResponseDto> {
-        val result = studentService.update(student)?.toStudentResponseDto() ?: throw StudentNotFoundException("Student with id ${student.id} not found")
-        return ResponseEntity.status(HttpStatus.OK).body(result)
-    }
+//    @PatchMapping
+//    fun updateStudent(@RequestBody student: StudentUpdateRequestDto): ResponseEntity<StudentResponseDto> {
+//        val result = studentService.update(student)?.toStudentResponseDto() ?: throw StudentNotFoundException("Student with id ${student.id} not found")
+//        return ResponseEntity.status(HttpStatus.OK).body(result)
+//    }
 
     @DeleteMapping("/{id}")
     fun deleteStudent(@PathVariable id: UUID) {

@@ -1,37 +1,46 @@
 package com.example.database.service
 
-import com.example.database.dao.StudentDAO
 import com.example.database.entity.Student
 import com.example.database.input.web.dto.StudentRequestDto
-import com.example.database.input.web.dto.StudentUpdateRequestDto
+import com.example.database.repository.StudentRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 @Service
 class StudentService(
-    private val studentRepository: StudentDAO
+    private val studentRepository: StudentRepository
 ) {
     fun findAll(): List<Student> = studentRepository.findAll()
 
-    fun findByLastName(lastName: String): List<Student> = studentRepository.findByLastName(lastName)
+    fun findByLastName(lastName: String): List<Student> = studentRepository.findAllByLastName(lastName)
 
     fun findById(id: UUID): Student? {
-        return studentRepository.getById(id)
+        val student = studentRepository.findById(id)
+        if (student.isPresent) return student.get()
+        return null
     }
 
-    @Transactional
     fun save(student: StudentRequestDto) {
-        studentRepository.save(student)
+        studentRepository.save(
+            Student(
+                firstName = student.firstName,
+                lastName = student.lastName,
+                email = student.email,
+            )
+        )
     }
 
-    @Transactional
-    fun update(student: StudentUpdateRequestDto): Student? {
-        return studentRepository.update(student)
-    }
+//    fun update(student: StudentUpdateRequestDto): Student? {
+//        return studentRepository.updateByIdEquals(student.id, Student(
+//                id = student.id,
+//                firstName = student.firstName,
+//                lastName = student.lastName,
+//                email = student.email
+//            )
+//        )
+//    }
 
-    @Transactional
     fun delete(id: UUID) {
-        studentRepository.delete(id)
+        studentRepository.deleteById(id)
     }
 }
