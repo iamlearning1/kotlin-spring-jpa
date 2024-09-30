@@ -56,7 +56,7 @@ class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
     }
 
     @Transactional
-    override fun delete(id: Int) {
+    override fun delete(id: UUID) {
         val student = entityManager.find(Student::class.java, id)
         entityManager.remove(student)
     }

@@ -17,5 +17,5 @@ interface StudentDAO {
 
     fun update(student: StudentUpdateRequestDto): Student
 
-    fun delete(id: Int)
+    fun delete(id: UUID)
 }
