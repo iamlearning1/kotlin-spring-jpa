@@ -8,6 +8,4 @@ import java.util.UUID
 
 @EnableJpaRepositories
 @Repository
-interface StudentRepository : JpaRepository<Student, UUID> {
-    fun findAllByLastName(lastName: String): List<Student>
-}
+interface StudentRepository : JpaRepository<Student, UUID>
