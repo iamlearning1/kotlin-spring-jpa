@@ -18,26 +18,6 @@ class StudentController(
     private val studentRepository: StudentDAO
 ) {
 
-    @ExceptionHandler(StudentNotFoundException::class)
-    fun handleException(e: StudentNotFoundException): ResponseEntity<StudentErrorResponse> =
-        ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-            StudentErrorResponse(
-                status = HttpStatus.NOT_FOUND.value(),
-                message = e.message.toString(),
-                timestamp = System.currentTimeMillis()
-            )
-        )
-
-    @ExceptionHandler
-    fun handleException(e: Exception): ResponseEntity<ErrorResponse> =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            ErrorResponse(
-                status = HttpStatus.BAD_REQUEST.value(),
-                message = e.message.toString(),
-                timestamp = System.currentTimeMillis()
-            )
-        )
-
     @GetMapping
     fun findAll(@RequestParam("lastName") lastName: String?): List<StudentResponseDto> {
         val students = if (lastName != null)
