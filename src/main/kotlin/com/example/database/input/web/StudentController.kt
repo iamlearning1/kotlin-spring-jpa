@@ -4,21 +4,39 @@ import com.example.database.dao.StudentDAO
 import com.example.database.input.web.dto.StudentRequestDto
 import com.example.database.input.web.dto.StudentResponseDto
 import com.example.database.input.web.dto.StudentUpdateRequestDto
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import com.example.database.input.web.error.ErrorResponse
+import com.example.database.input.web.error.StudentErrorResponse
+import com.example.database.input.web.error.StudentNotFoundException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/students")
 class StudentController(
     private val studentRepository: StudentDAO
 ) {
+
+    @ExceptionHandler(StudentNotFoundException::class)
+    fun handleException(e: StudentNotFoundException): ResponseEntity<StudentErrorResponse> =
+        ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            StudentErrorResponse(
+                status = HttpStatus.NOT_FOUND.value(),
+                message = e.message.toString(),
+                timestamp = System.currentTimeMillis()
+            )
+        )
+
+    @ExceptionHandler
+    fun handleException(e: Exception): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            ErrorResponse(
+                status = HttpStatus.BAD_REQUEST.value(),
+                message = e.message.toString(),
+                timestamp = System.currentTimeMillis()
+            )
+        )
 
     @GetMapping
     fun findAll(@RequestParam("lastName") lastName: String?): List<StudentResponseDto> {
@@ -31,9 +49,10 @@ class StudentController(
     }
 
     @GetMapping("/{id}")
-    fun findById(@PathVariable("id") id: Int): StudentResponseDto? {
+    fun findById(@PathVariable("id") id: UUID): StudentResponseDto? {
         val student = studentRepository.getById(id)
-        return student?.toStudentResponseDto()
+            ?: throw StudentNotFoundException("Student with id $id not found")
+        return student.toStudentResponseDto()
     }
 
     @PostMapping

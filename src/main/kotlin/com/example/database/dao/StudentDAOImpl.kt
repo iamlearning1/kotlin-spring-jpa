@@ -22,7 +22,7 @@ class StudentDAOImpl(private val entityManager: EntityManager) : StudentDAO {
             .executeUpdate()
     }
 
-    override fun getById(id: Int): Student? {
+    override fun getById(id: UUID): Student? {
         return entityManager.find(Student::class.java, id)
     }
 
