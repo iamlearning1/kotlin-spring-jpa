@@ -4,52 +4,45 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.invoke
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.provisioning.InMemoryUserDetailsManager
+import org.springframework.security.provisioning.JdbcUserDetailsManager
+import org.springframework.security.provisioning.UserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
+import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
 
     @Bean
-    fun userDetailsService(): UserDetailsService {
-        val users: User.UserBuilder = User.withDefaultPasswordEncoder()
-        val manager = InMemoryUserDetailsManager()
+    fun userDetailsManager(datasource: DataSource): UserDetailsManager {
+        val userDetailsManager = JdbcUserDetailsManager(datasource)
 
-        manager.createUser(users.username("user").password("password").roles("STUDENT").build())
-        manager.createUser(users.username("admin").password("password").roles("STUDENT","TEACHER").build())
+        userDetailsManager.usersByUsernameQuery = "select user_id, pw, active from members where user_id=?"
 
-        return manager
+        userDetailsManager.setAuthoritiesByUsernameQuery(
+            "select user_id, role from roles where user_id=?");
+
+        return userDetailsManager
     }
 
     @Order(1)
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-         http {
-             securityMatcher("api/students")
-//             securityMatcher("api/students/**")
-             authorizeRequests {
-                 authorize(anyRequest, hasRole("TEACHER"))
-             }
-             httpBasic { }
-         }
-        return http.build()
-//        return http
-//            .authorizeHttpRequests {
-//                it
-//                    .requestMatchers(HttpMethod.GET, "/api/students").hasRole("STUDENT")
-//                    .requestMatchers(HttpMethod.GET, "/api/students/**").hasRole("STUDENT")
-//                    .requestMatchers(HttpMethod.POST, "/api/students").hasRole("TEACHER")
-//                    .requestMatchers(HttpMethod.PUT, "/api/students").hasRole("TEACHER")
-//                    .requestMatchers(HttpMethod.DELETE, "/api/students/**").hasRole("ADMIN")
-//            }
-//            .httpBasic {  }
-//            .csrf { it.disable() }
-//            .build()
+        return http
+            .csrf { it.disable() }
+            .authorizeHttpRequests {
+                it
+                    .requestMatchers(HttpMethod.GET, "/api/students").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/students/**").hasRole("STUDENT")
+                    .requestMatchers(HttpMethod.POST, "/api/students").hasRole("TEACHER")
+                    .requestMatchers(HttpMethod.PUT, "/api/students").hasRole("TEACHER")
+                    .requestMatchers(HttpMethod.DELETE, "/api/students/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
+            }
+            .httpBasic { Customizer.withDefaults<HttpSecurity>() }
+            .build()
     }
 }
